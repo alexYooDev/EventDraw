@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.v1 import api_router
 from app.core.config import settings
 
 # Create FastAPI application instance
@@ -20,6 +21,9 @@ app.add_middleware(
     allow_headers=["*"], # Allows all headers
 )
 
+# Include API v1 router
+app.include_router(api_router, prefix=settings.API_V1_PREFIX)
+
 @app.get("/")
 async def root():
     """ 
@@ -27,12 +31,5 @@ async def root():
     """
     return {
         "message": "Luck of a Draw Roulette API",
-        "status": "running"
+        "status": "running | healthy"
     }
-
-@app.get("/health")
-async def health_check():
-    """ 
-    Health check endpoint.
-    """
-    return {"status": "healthy"}
