@@ -5,10 +5,11 @@ These handle HTTP requests for customer operations.
 
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.core.rate_limit import limiter
 from app.repositories.customer_repository import CustomerRepository
 from app.schemas.customer import (
     CustomerCreate,
@@ -26,12 +27,16 @@ from app.schemas.notification import (
 router = APIRouter(prefix='/customers', tags=['customers'])
 
 @router.post('', response_model=CustomerResponse, status_code=status.HTTP_201_CREATED)
+@limiter.limit("10/minute")  # Limit to 10 customer submissions per minute
 def create_customer(
+    request: Request,
     customer_data: CustomerCreate,
     db: Session = Depends(get_db)
 ):
     """
     Create a new customer entry.
+    
+    Rate limited to 10 submissions per minute to prevent spam.
     
     - name: customer's full name
     - email: customer's email address (must be unique)
