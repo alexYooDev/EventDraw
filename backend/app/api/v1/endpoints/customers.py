@@ -17,6 +17,11 @@ from app.schemas.customer import (
     CustomerUpdate
 )
 
+from app.schemas.notification import (
+    WinnerNotification,
+    NotificationResponse
+)
+
 # Create router with prefix and tags for organization
 router = APIRouter(prefix='/customers', tags=['customers'])
 
@@ -153,7 +158,7 @@ def get_random_winner(db: Session = Depends(get_db)):
 
 @router.post('/{customer_id}/mark-winner', response_model=CustomerResponse)
 def mark_customer_as_winner(customer_id: int, db: Session = Depends(get_db)):
-    """ 
+    """
     Mark a customer as a winner
 
     This updates ths is_winner flag to True
@@ -168,5 +173,49 @@ def mark_customer_as_winner(customer_id: int, db: Session = Depends(get_db)):
         )
 
     return customer
+
+
+@router.post('/notify-winner', response_model=NotificationResponse)
+def notify_winner(notification_data: WinnerNotification, db: Session = Depends(get_db)):
+    """
+    Send notification to winner
+
+    This endpoint handles sending email notifications to winners.
+    In a production environment, this would integrate with an email service (SendGrid, AWS SES, etc.)
+
+    - customer_id: ID of the winner to notify
+    - send_immediately: Whether to send the notification now or queue it for later
+    """
+    repo = CustomerRepository(db)
+    customer = repo.get_by_id(notification_data.customer_id)
+
+    if not customer:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Customer not found"
+        )
+
+    if not customer.is_winner:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Customer is not marked as a winner"
+        )
+
+    # TODO: In production, integrate with email service here
+    # For now, we'll just simulate sending the email
+    if notification_data.send_immediately:
+        # Simulated email sending
+        message = f"Winner notification sent to {customer.email}"
+        email_sent_to = customer.email
+    else:
+        # Queue for later
+        message = f"Winner notification queued for {customer.email}"
+        email_sent_to = None
+
+    return NotificationResponse(
+        success=True,
+        message=message,
+        email_sent_to=email_sent_to
+    )
 
 

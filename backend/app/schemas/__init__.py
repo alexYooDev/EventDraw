@@ -12,11 +12,18 @@ from app.schemas.customer import (
     CustomerListResponse,
 )
 
+from app.schemas.notification import (
+    WinnerNotification,
+    NotificationResponse,
+)
+
 __all__ = [
     "CustomerBase",
     "CustomerCreate",
     "CustomerUpdate",
     "CustomerResponse",
     "CustomerListResponse",
+    "WinnerNotification",
+    "NotificationResponse"
 ]
 
