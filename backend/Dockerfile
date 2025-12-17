@@ -4,11 +4,12 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Install dependencies
-COPY backend/requirements.txt .
+# Railway uses backend/ as build context, so paths are relative to that
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code from backend directory
-COPY backend/ .
+# Copy application code
+COPY . .
 
 # Expose port (Railway will set $PORT automatically)
 EXPOSE 8000
