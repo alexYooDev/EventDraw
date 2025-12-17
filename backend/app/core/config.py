@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     DATABASE_URL: str
 
     # Application
-    ENVIRONMENT: str = "development"
+    ENVIRONMENT: str = "production"
     PROJECT_NAME: str = "Luck of a Draw Roulette"
     API_V1_PREFIX: str = "/api/v1"
 

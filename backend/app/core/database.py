@@ -8,7 +8,7 @@ from app.core.config import settings
 engine = create_engine(
     settings.DATABASE_URL,
     pool_pre_ping= True, # Verifies connections before using them
-    echo=settings.ENVIRONMENT == "development" # Log SQL queries in development
+    echo=settings.ENVIRONMENT == "production" # Log SQL queries in development
     )
 
 # Factory Design Pattern
