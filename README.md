@@ -7,7 +7,7 @@ A full-stack web application that gamifies customer feedback collection through 
 - **Frontend (Customer):** https://event-draw-seven.vercel.app/
 - **Frontend (Admin):** https://event-draw-seven.vercel.app/admin
 - **Backend API:** https://eventdraw-production.up.railway.app/
-- **API Documentation:** https://eventdraw-production.up.railway.app/api/v1/docs
+- **API Documentation:** https://eventdraw-production.up.railway.app/docs
 
 ## Features
 
