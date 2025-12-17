@@ -5,6 +5,7 @@
  * Routes:
  * / - Public feedback page (customer-facing)
  * /login - Admin login
+ * /privacy - Privacy policy
  * /admin - Admin dashboard (business owner, protected)
  */
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
@@ -13,6 +14,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { PublicFeedbackPage } from './pages/PublicFeedbackPage';
 import { AdminDashboard } from './pages/AdminDashboard';
 import LoginPage from './pages/LoginPage';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 import ProtectedRoute from './components/ProtectedRoute';
 import './App.css';
 
@@ -24,6 +26,7 @@ function App() {
           <Routes>
             <Route path="/" element={<PublicFeedbackPage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route 
               path="/admin" 
               element={

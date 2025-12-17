@@ -4,6 +4,7 @@
  */
 
 import { useState, type FormEvent } from 'react';
+import { Link } from 'react-router-dom';
 import { customerService } from '../services/customerService';
 import type { CustomerCreate } from '../types/customer';
 
@@ -19,6 +20,7 @@ export function CustomerForm({onSuccess}: CustomerFormProps) {
     });
     
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [consentGiven, setConsentGiven] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
 
@@ -96,6 +98,24 @@ export function CustomerForm({onSuccess}: CustomerFormProps) {
                         disabled={isSubmitting}
                     />
                 </div>
+                {/* Privacy Policy Consent */}
+                <div className="flex items-start">
+                    <input
+                        type="checkbox"
+                        id="consent"
+                        checked={consentGiven}
+                        onChange={(e) => setConsentGiven(e.target.checked)}
+                        className="mt-1 mr-2 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        required
+                    />
+                    <label htmlFor="consent" className="text-xs sm:text-sm text-gray-700 text-left">
+                        I agree to the{' '}
+                        <Link to="/privacy" className="text-blue-600 hover:text-blue-700 underline" target="_blank">
+                            Privacy Policy
+                        </Link>
+                        {' '}and consent to my data being stored for prize draw purposes.
+                    </label>
+                </div>
                 {/* Error Message */}
                 {error && (
                     <div className='p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-xs sm:text-sm'>
@@ -111,7 +131,7 @@ export function CustomerForm({onSuccess}: CustomerFormProps) {
                 {/* Submit Button */}
                 <button
                     type='submit'
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || !consentGiven}
                     className='w-full bg-blue-600 text-white py-2 sm:py-2.5 px-4 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors text-sm sm:text-base'
                 >
                     {isSubmitting ? 'Submitting...' : 'Submit Feedback'}
