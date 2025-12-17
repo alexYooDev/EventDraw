@@ -2,14 +2,15 @@
  * AdminAuth Component
  * Simple password protection for admin dashboard
  */
-import { useState, FormEvent } from 'react';
+import { useState } from 'react';
+import type { FormEvent } from 'react';
 
 interface AdminAuthProps {
   onAuthenticated: () => void;
 }
 
 // In production, this should be moved to environment variables and validated on the backend
-const ADMIN_PASSWORD = 'admin123'; // Change this to a secure password
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD; // Change this to a secure password
 
 export function AdminAuth({ onAuthenticated }: AdminAuthProps) {
   const [password, setPassword] = useState('');
