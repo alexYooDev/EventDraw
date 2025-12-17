@@ -20,6 +20,12 @@ class Settings(BaseSettings):
     FROM_EMAIL: str = "noreply@notifications.luck-of-a-draw.com"
     FROM_NAME: str = "Luck of a Draw"
 
+    # Authentication & Security
+    JWT_SECRET_KEY: str = "your-secret-key-change-this-in-production-use-openssl-rand-hex-32"
+    JWT_ALGORITHM: str = "HS256"
+    JWT_EXPIRATION_MINUTES: int = 1440  # 24 hours
+    ADMIN_PASSWORD_HASH: str = ""  # Hashed admin password (set via environment variable)
+
     # CORS - Frontend URLs allowed to access the API
     # For production, you can pass comma-separated URLs as env var
     # Example: CORS_ORIGINS="https://your-app.vercel.app,https://custom-domain.com"
