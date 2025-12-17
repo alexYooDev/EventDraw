@@ -107,7 +107,7 @@ class EmailService:
                                     
                                     <p style="margin: 30px 0 0 0; color: #666666; font-size: 16px; line-height: 1.6;">
                                         Best regards,<br>
-                                        <strong>The Luck of a Draw Team</strong>
+                                        <strong>Didi Beauty Studio Team</strong>
                                     </p>
                                 </td>
                             </tr>
