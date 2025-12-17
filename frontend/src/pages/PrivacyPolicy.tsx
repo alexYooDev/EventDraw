@@ -12,7 +12,7 @@ export default function PrivacyPolicy() {
         </div>
 
         {/* Content */}
-        <div className="prose max-w-none">
+        <div className="prose max-w-none text-left">
           <section className="mb-6">
             <h2 className="text-2xl font-semibold text-gray-900 mb-3">1. Information We Collect</h2>
             <p className="text-gray-700 mb-2">When you submit feedback through our platform, we collect:</p>
@@ -87,7 +87,7 @@ export default function PrivacyPolicy() {
               For privacy-related questions or to exercise your rights, contact us at:
             </p>
             <p className="text-gray-700 mt-2">
-              <strong>Email:</strong> privacy@didibeauty.com<br />
+              <strong>Email:</strong> didibeautystudiobne@gmail.com<br />
               <strong>Business:</strong> Didi Beauty Studio
             </p>
           </section>
