@@ -20,10 +20,19 @@ apiClient.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response) {
+            // Handle 401 Unauthorized - redirect to login
+            if (error.response.status === 401) {
+                // Clear token
+                localStorage.removeItem('admin_token');
+                // Redirect to login page
+                if (window.location.pathname !== '/login') {
+                    window.location.href = '/login';
+                }
+            }
             // Server responded with error status
             console.error('API Error:', error.response.data);            
         } else if (error.request) {
-            // Request maed but no response received
+            // Request made but no response received
             console.error('Network Error:', error.message);
         } else {
             // Something else happened

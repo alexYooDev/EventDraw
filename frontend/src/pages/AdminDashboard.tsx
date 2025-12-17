@@ -2,10 +2,10 @@
  * AdminDashboard
  * Business owner dashboard for managing customers and drawing winners
  */
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { CustomerList } from '../components/CustomerList';
 import { RouletteWheel } from '../components/RouletteWheel';
-import { AdminAuth } from '../components/AdminAuth';
+import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { themes } from '../types/theme';
 import type { ThemeType } from '../types/theme';
@@ -14,17 +14,9 @@ type Tab = 'roulette' | 'customers';
 
 export function AdminDashboard() {
   const { theme, setTheme } = useTheme();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { logout } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>('roulette');
   const [refreshKey, setRefreshKey] = useState(0);
-
-  // Check if already authenticated in session storage
-  useEffect(() => {
-    const authenticated = sessionStorage.getItem('admin_authenticated');
-    if (authenticated === 'true') {
-      setIsAuthenticated(true);
-    }
-  }, []);
 
   const handleWinnerSelected = () => {
     // Trigger customer list refresh to show updated winner status
@@ -32,18 +24,12 @@ export function AdminDashboard() {
   };
 
   const handleLogout = () => {
-    sessionStorage.removeItem('admin_authenticated');
-    setIsAuthenticated(false);
+    logout();
   };
 
   const handleThemeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setTheme(e.target.value as ThemeType);
   };
-
-  // Show authentication screen if not authenticated
-  if (!isAuthenticated) {
-    return <AdminAuth onAuthenticated={() => setIsAuthenticated(true)} />;
-  }
 
   return (
     <div className={`min-h-screen bg-gradient-to-br ${theme.colors.background}`}>
