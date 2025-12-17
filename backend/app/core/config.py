@@ -17,7 +17,7 @@ class Settings(BaseSettings):
 
     # Email Configuration (Resend)
     RESEND_API_KEY: str = ""  # Set via environment variable
-    FROM_EMAIL: str = "onboarding@resend.dev"  # Default test email
+    FROM_EMAIL: str = "noreply@notifications.luck-of-a-draw.com"
     FROM_NAME: str = "Luck of a Draw"
 
     # CORS - Frontend URLs allowed to access the API
