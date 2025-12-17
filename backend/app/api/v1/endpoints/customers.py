@@ -178,14 +178,15 @@ def mark_customer_as_winner(customer_id: int, db: Session = Depends(get_db)):
 @router.post('/notify-winner', response_model=NotificationResponse)
 def notify_winner(notification_data: WinnerNotification, db: Session = Depends(get_db)):
     """
-    Send notification to winner
+    Send notification to winner via email.
 
-    This endpoint handles sending email notifications to winners.
-    In a production environment, this would integrate with an email service (SendGrid, AWS SES, etc.)
+    Uses Resend API to send actual email notifications to winners.
 
     - customer_id: ID of the winner to notify
     - send_immediately: Whether to send the notification now or queue it for later
     """
+    from app.services.email_service import EmailService
+    
     repo = CustomerRepository(db)
     customer = repo.get_by_id(notification_data.customer_id)
 
@@ -201,21 +202,34 @@ def notify_winner(notification_data: WinnerNotification, db: Session = Depends(g
             detail="Customer is not marked as a winner"
         )
 
-    # TODO: In production, integrate with email service here
-    # For now, we'll just simulate sending the email
     if notification_data.send_immediately:
-        # Simulated email sending
-        message = f"Winner notification sent to {customer.email}"
-        email_sent_to = customer.email
+        # Send email via Resend
+        try:
+            email_service = EmailService()
+            success, message = email_service.send_winner_notification(customer)
+            
+            return NotificationResponse(
+                success=success,
+                message=message,
+                email_sent_to=customer.email if success else None
+            )
+        except ValueError as e:
+            # Handle missing API key
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Email service not configured: {str(e)}"
+            )
+        except Exception as e:
+            # Handle other email errors
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Failed to send email: {str(e)}"
+            )
     else:
-        # Queue for later
+        # Queue for later (not implemented yet)
         message = f"Winner notification queued for {customer.email}"
-        email_sent_to = None
-
-    return NotificationResponse(
-        success=True,
-        message=message,
-        email_sent_to=email_sent_to
-    )
-
-
+        return NotificationResponse(
+            success=True,
+            message=message,
+            email_sent_to=None
+        )

@@ -14,6 +14,11 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "Luck of a Draw Roulette"
     API_V1_PREFIX: str = "/api/v1"
 
+    # Email Configuration (Resend)
+    RESEND_API_KEY: str = self.RESEND_API_KEY  # Set in environment variables
+    FROM_EMAIL: str = "onboarding@resend.dev"  # Default test email
+    FROM_NAME: str = "Luck of a Draw"
+
     # CORS - Frontend URLs allowed to access the API
     # For production, you can pass comma-separated URLs as env var
     # Example: CORS_ORIGINS="https://your-app.vercel.app,https://custom-domain.com"
