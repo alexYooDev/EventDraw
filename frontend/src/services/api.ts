@@ -17,6 +17,19 @@ export const apiClient = axios.create({
     timeout: 10000 // 10 seconds
 });
 
+// Request interceptor to force HTTPS
+apiClient.interceptors.request.use(
+    (config) => {
+        // Force HTTPS for production URLs
+        if (config.baseURL && config.baseURL.startsWith('http://') && !config.baseURL.includes('localhost')) {
+            config.baseURL = config.baseURL.replace('http://', 'https://');
+            console.warn('Forced HTTP to HTTPS:', config.baseURL);
+        }
+        return config;
+    },
+    (error) => Promise.reject(error)
+);
+
 // Response interceptor for error handling
 
 apiClient.interceptors.response.use(
