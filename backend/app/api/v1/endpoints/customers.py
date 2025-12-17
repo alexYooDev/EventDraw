@@ -25,7 +25,7 @@ from app.schemas.notification import (
 # Create router with prefix and tags for organization
 router = APIRouter(prefix='/customers', tags=['customers'])
 
-@router.post('/', response_model=CustomerResponse, status_code=status.HTTP_201_CREATED)
+@router.post('', response_model=CustomerResponse, status_code=status.HTTP_201_CREATED)
 def create_customer(
     customer_data: CustomerCreate,
     db: Session = Depends(get_db)
@@ -49,7 +49,7 @@ def create_customer(
 
     return repo.create(customer_data)
 
-@router.get('/', response_model=CustomerListResponse)
+@router.get('', response_model=CustomerListResponse)
 def get_customers(
     skip: int = 0,
     limit: int = 100,
