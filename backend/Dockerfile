@@ -15,5 +15,6 @@ COPY . .
 EXPOSE 8000
 
 # Run migrations and start the server
-# Note: main.py is in app/ directory, so we use app.main:app
-CMD alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}
+# Note: main.py is in app/ directory, so we use app.main:app  
+# Skip migration errors (e.g., if tables already exist) and start server
+CMD (alembic upgrade head || true) && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}
