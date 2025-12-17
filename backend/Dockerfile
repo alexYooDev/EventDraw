@@ -11,10 +11,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
+# Copy startup script
+COPY start.sh .
+RUN chmod +x start.sh
+
 # Expose port (Railway will set $PORT automatically)
 EXPOSE 8000
 
-# Run migrations and start the server
-# Note: main.py is in app/ directory, so we use app.main:app  
-# Skip migration errors (e.g., if tables already exist) and start server
-CMD (alembic upgrade head || true) && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}
+# Run startup script
+CMD ["./start.sh"]
