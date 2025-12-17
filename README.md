@@ -2,6 +2,13 @@
 
 A full-stack web application that gamifies customer feedback collection through a roulette-style winner selection system. Customers submit feedback and are automatically entered for a chance to win prizes through an animated roulette wheel.
 
+## 🚀 Live Demo
+
+- **Frontend (Customer):** https://event-draw-seven.vercel.app/
+- **Frontend (Admin):** https://event-draw-seven.vercel.app/admin
+- **Backend API:** https://eventdraw-production.up.railway.app/
+- **API Documentation:** https://eventdraw-production.up.railway.app/api/v1/docs
+
 ## Features
 
 ### Customer-Facing
@@ -263,17 +270,59 @@ pytest --cov          # Run with coverage
 
 ## Deployment
 
-### Frontend (Vercel/Netlify)
-1. Push code to GitHub
-2. Connect repository to Vercel/Netlify
-3. Set environment variable: `VITE_API_BASE_URL`
-4. Deploy
+### Frontend (Vercel)
 
-### Backend (Railway/Render/Heroku)
-1. Push code to GitHub
-2. Connect repository to hosting service
-3. Set environment variables (DATABASE_URL, etc.)
-4. Deploy
+**Current Deployment:** https://event-draw-seven.vercel.app/
+
+1. **Push code to GitHub**
+   ```bash
+   git push origin master
+   ```
+
+2. **Connect to Vercel**
+   - Import your GitHub repository
+   - Framework Preset: Vite
+   - Root Directory: `frontend`
+
+3. **Environment Variables**
+   ```
+   VITE_API_BASE_URL=https://eventdraw-production.up.railway.app/api/v1
+   VITE_ADMIN_PASSWORD=your_secure_password
+   ```
+
+4. **Deploy**
+   - Vercel auto-deploys on push to master
+   - Custom domain: Configure in Vercel dashboard
+
+**Important Files:**
+- `vercel.json` - SPA routing configuration (redirects all routes to index.html)
+
+### Backend (Railway)
+
+**Current Deployment:** https://eventdraw-production.up.railway.app/
+
+1. **Setup Database**
+   - Add PostgreSQL database in Railway dashboard
+   - Railway automatically sets `DATABASE_URL` environment variable
+
+2. **Connect to Railway**
+   - Import your GitHub repository
+   - Root Directory: `backend`
+
+3. **Environment Variables**
+   ```
+   DATABASE_URL=postgresql://... (auto-set by Railway)
+   CORS_ORIGINS=["https://event-draw-seven.vercel.app"]
+   ```
+
+4. **Deploy**
+   - Railway auto-deploys on push to master
+   - Uses Dockerfile for deployment
+
+**Important Files:**
+- `Dockerfile` - Container build configuration
+- `railway.toml` - Railway deployment settings
+- `start.sh` - Startup script with migration handling
 
 ## Future Enhancements
 
