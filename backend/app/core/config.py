@@ -16,8 +16,8 @@ class Settings(BaseSettings):
     API_V1_PREFIX: str = "/api/v1"
 
     # Email Configuration (Resend)
-    RESEND_API_KEY: str = getenv("RESEND_API_KEY")
-    FROM_EMAIL: str = "onboarding@resend.dev"
+    RESEND_API_KEY: str = ""  # Set via environment variable
+    FROM_EMAIL: str = "onboarding@resend.dev"  # Default test email
     FROM_NAME: str = "Luck of a Draw"
 
     # CORS - Frontend URLs allowed to access the API
