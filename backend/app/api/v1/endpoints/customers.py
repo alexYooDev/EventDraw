@@ -26,7 +26,7 @@ from app.schemas.notification import (
 # Create router with prefix and tags for organization
 router = APIRouter(prefix='/customers', tags=['customers'])
 
-@router.post('', response_model=CustomerResponse, status_code=status.HTTP_201_CREATED)
+@router.post('/', response_model=CustomerResponse, status_code=status.HTTP_201_CREATED)
 @limiter.limit("10/minute")  # Limit to 10 customer submissions per minute
 def create_customer(
     request: Request,
@@ -54,7 +54,7 @@ def create_customer(
 
     return repo.create(customer_data)
 
-@router.get('', response_model=CustomerListResponse)
+@router.get('/', response_model=CustomerListResponse)
 def get_customers(
     skip: int = 0,
     limit: int = 100,
@@ -162,14 +162,18 @@ def get_random_winner(db: Session = Depends(get_db)):
     return winner
 
 @router.post('/{customer_id}/mark-winner', response_model=CustomerResponse)
-def mark_customer_as_winner(customer_id: int, db: Session = Depends(get_db)):
+def mark_customer_as_winner(
+    customer_id: int, 
+    winner_place: int,
+    db: Session = Depends(get_db)
+):
     """
     Mark a customer as a winner
 
-    This updates ths is_winner flag to True
+    This updates the is_winner flag to True and sets the winner_place
     """
     repo = CustomerRepository(db)
-    customer = repo.mark_as_winner(customer_id)
+    customer = repo.mark_as_winner(customer_id, winner_place)
 
     if not customer:
         raise HTTPException(

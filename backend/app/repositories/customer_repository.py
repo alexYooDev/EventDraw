@@ -122,12 +122,13 @@ class CustomerRepository:
             .first()
         )
 
-    def mark_as_winner(self, customer_id: int) -> Optional[Customer]:
+    def mark_as_winner(self, customer_id: int, winner_place: int) -> Optional[Customer]:
         """
             Mark a customer as winner.
 
             Args:
                 customer_id: Customer's ID
+                winner_place: The place (1, 2, or 3)
 
             Returns:
                 Updated Customer if found, None otherwise
@@ -138,6 +139,7 @@ class CustomerRepository:
             return None
 
         db_customer.is_winner = True
+        db_customer.winner_place = winner_place
         self.db.commit()
         self.db.refresh(db_customer)
         return db_customer

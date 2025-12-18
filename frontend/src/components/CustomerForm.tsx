@@ -6,6 +6,7 @@
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { customerService } from '../services/customerService';
+import { useTheme } from '../contexts/ThemeContext';
 import type { CustomerCreate } from '../types/customer';
 
 interface CustomerFormProps {
@@ -13,6 +14,7 @@ interface CustomerFormProps {
 }
 
 export function CustomerForm({onSuccess}: CustomerFormProps) {
+    const { theme } = useTheme();
     const [formData, setFormData] = useState<CustomerCreate>({
         name: '',
         email: '',
@@ -38,8 +40,19 @@ export function CustomerForm({onSuccess}: CustomerFormProps) {
             if (onSuccess) {
                 onSuccess();
             }
-        } catch (err: unknown) {
-            const errorMessage = (err as any).response?.data?.detail || 'Failed to submit feedback. Please try again.';
+        } catch (err: any) {
+            const detail = err.response?.data?.detail;
+            let errorMessage = 'Failed to submit feedback. Please try again.';
+            
+            if (typeof detail === 'string') {
+                errorMessage = detail;
+            } else if (Array.isArray(detail)) {
+                // Handle FastAPI validation error list
+                errorMessage = detail.map((e: any) => e.msg).join(', ');
+            } else if (detail && typeof detail === 'object') {
+                errorMessage = JSON.stringify(detail);
+            }
+            
             setError(errorMessage);
         } finally {
             setIsSubmitting(false);
@@ -132,7 +145,9 @@ export function CustomerForm({onSuccess}: CustomerFormProps) {
                 <button
                     type='submit'
                     disabled={isSubmitting || !consentGiven}
-                    className='w-full bg-blue-600 text-white py-2 sm:py-2.5 px-4 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors text-sm sm:text-base'
+                    className={`w-full text-white py-2 sm:py-2.5 px-4 rounded-lg font-medium transition-all transform hover:scale-[1.02] active:scale-95 disabled:bg-gray-400 disabled:hover:scale-100 disabled:cursor-not-allowed text-sm sm:text-base shadow-lg ${
+                        isSubmitting || !consentGiven ? 'bg-gray-400' : `bg-gradient-to-r ${theme.gradients.button}`
+                    }`}
                 >
                     {isSubmitting ? 'Submitting...' : 'Submit Feedback'}
                 </button>
