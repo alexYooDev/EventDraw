@@ -39,6 +39,7 @@ class CustomerResponse(CustomerBase):
     Include all database fields.
     """
     id: int
+    winner_place: Optional[int] = None
     is_winner: bool
     created_at: datetime
     updated_at: Optional[datetime] = None

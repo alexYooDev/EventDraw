@@ -31,11 +31,15 @@ class EmailService:
             # Create HTML email content
             html_content = self._create_winner_email_html(customer)
             
+            # Determine subject based on place
+            place_str = {1: "1st", 2: "2nd", 3: "3rd"}.get(customer.winner_place, "")
+            subject = f"🎉 Congratulations! You won the {place_str} Prize!" if place_str else "🎉 Congratulations! You're a Winner!"
+
             # Send email via Resend
             params = {
                 "from": f"{settings.FROM_NAME} <{settings.FROM_EMAIL}>",
                 "to": [customer.email],
-                "subject": "🎉 Congratulations! You're a Winner!",
+                "subject": subject,
                 "html": html_content,
             }
             
@@ -60,18 +64,21 @@ class EmailService:
         Returns:
             str: HTML email content
         """
-        # Get template file path
-        template_dir = os.path.join(os.path.dirname(__file__), '..', 'templates')
-        template_path = os.path.join(template_dir, 'winner_email.html')
-        
-        # Read template file
-        with open(template_path, 'r', encoding='utf-8') as f:
-            template = f.read()
-        
+        # Prize details
+        prizes = {
+            1: "Whipped Shampoo for Eyelash",
+            2: "Eyelash Coating Gel",
+            3: "Eyelash Removal Service"
+        }
+        prize_name = prizes.get(customer.winner_place, "a special prize")
+        place_str = {1: "1st", 2: "2nd", 3: "3rd"}.get(customer.winner_place, "")
+
         # Substitute customer data
         html_content = template.format(
             customer_name=customer.name,
             customer_feedback=customer.feedback,
+            prize_name=prize_name,
+            place_str=place_str,
             service_provider='Didi Beauty Studio'
         )
         

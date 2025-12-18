@@ -2,8 +2,8 @@ import { Link } from 'react-router-dom';
 
 export default function PrivacyPolicy() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 py-12 px-4">
-      <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-8">
+    <div className="min-h-screen w-full bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 py-12">
+      <div className="w-full px-4 sm:px-8 lg:px-16 bg-white shadow-lg p-8">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Privacy Policy</h1>

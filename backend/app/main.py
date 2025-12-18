@@ -12,6 +12,7 @@ from app.middleware.security import SecurityHeadersMiddleware
 app = FastAPI(
     title=settings.PROJECT_NAME,
     openapi_url=f"{settings.API_V1_PREFIX}/openapi.json",
+    redirect_slashes=False,
 )
 
 # Add rate limiting

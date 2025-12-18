@@ -61,8 +61,10 @@ export const customerService = {
     /**
      * Mark a customer as winner
      */
-    markAsWinner: async(id: number): Promise<Customer> => {
-        const response = await apiClient.post<Customer>(`/customers/${id}/mark-winner`);
+    markAsWinner: async(id: number, winnerPlace: number): Promise<Customer> => {
+        const response = await apiClient.post<Customer>(`/customers/${id}/mark-winner`, null, {
+            params: { winner_place: winnerPlace }
+        });
         return response.data;
     },
 

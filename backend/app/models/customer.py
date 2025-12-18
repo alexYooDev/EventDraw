@@ -20,7 +20,8 @@ class Customer(Base):
     name = Column(String(225), nullable=False)
     email = Column(String(225), nullable=False, unique=True, index=True)
     feedback = Column(Text, nullable=False)
-    is_winner = Column(Boolean, default=False, nullable=False)
+    winner_place = Column(Integer, nullable=True)
+    is_winner = Column(Boolean, default=winner_place > 0, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 

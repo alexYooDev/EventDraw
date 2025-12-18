@@ -19,6 +19,7 @@ export function RouletteWheel({ onWinnerSelected }: RouletteWheelProps) {
   const [rotation, setRotation] = useState(0);
   const [showNotificationDialog, setShowNotificationDialog] = useState(false);
   const [pendingWinner, setPendingWinner] = useState<Customer | null>(null);
+  const [selectedPlace, setSelectedPlace] = useState<number>(1);
 
   const spinWheel = async () => {
     if (isSpinning) return;
@@ -55,8 +56,8 @@ export function RouletteWheel({ onWinnerSelected }: RouletteWheelProps) {
     if (!pendingWinner) return;
 
     try {
-      // Mark customer as winner
-      await customerService.markAsWinner(pendingWinner.id);
+      // Mark customer as winner with selected place
+      await customerService.markAsWinner(pendingWinner.id, selectedPlace);
 
       // Send notification
       const notificationResult = await customerService.notifyWinner(pendingWinner.id, sendNow);
@@ -180,8 +181,27 @@ export function RouletteWheel({ onWinnerSelected }: RouletteWheelProps) {
                 <p className="text-xs sm:text-sm text-gray-600 break-all">{pendingWinner.email}</p>
               </div>
               <p className="text-sm sm:text-base text-gray-700 mb-4 sm:mb-6">
-                Would you like to send a notification to the winner now?
+                Assign a prize place and send a notification:
               </p>
+              
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Select Prize</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[1, 2, 3].map((p) => (
+                    <button
+                      key={p}
+                      onClick={() => setSelectedPlace(p)}
+                      className={`py-2 px-3 rounded-lg border-2 font-bold text-sm transition-all ${
+                        selectedPlace === p 
+                          ? 'border-blue-600 bg-blue-50 text-blue-700' 
+                          : 'border-gray-200 bg-gray-50 text-gray-400 hover:border-gray-300'
+                      }`}
+                    >
+                      {p}{p === 1 ? 'st' : p === 2 ? 'nd' : 'rd'}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
