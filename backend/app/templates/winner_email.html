@@ -5,65 +5,88 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>You're a Winner!</title>
     </head>
-    <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+    <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Arial, sans-serif; background-color: #f0f2f5;">
         <table role="presentation" style="width: 100%; border-collapse: collapse;">
             <tr>
-                <td align="center" style="padding: 40px 0;">
-                    <table role="presentation" style="width: 600px; border-collapse: collapse; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                        <!-- Header -->
+                <td align="center" style="padding: 40px 10px;">
+                    <table role="presentation" style="width: 100%; max-width: 600px; border-collapse: collapse; background-color: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                        <!-- Header with Gradient -->
                         <tr>
-                            <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px; text-align: center;">
-                                <h1 style="margin: 0; color: #ffffff; font-size: 32px; font-weight: bold;">
-                                    🎰 Luck of a Draw
+                            <td style="background: linear-gradient(135deg, #7c3aed 0%, #db2777 100%); padding: 50px 40px; text-align: center;">
+                                <div style="font-size: 48px; margin-bottom: 20px;">🎉</div>
+                                <h1 style="margin: 0; color: #ffffff; font-size: 36px; font-weight: 800; letter-spacing: -1px;">
+                                    You're a Winner!
                                 </h1>
+                                <p style="margin: 10px 0 0 0; color: rgba(255,255,255,0.9); font-size: 18px; font-weight: 500;">
+                                    Luck of a Draw @ Didi Beauty Studio
+                                </p>
                             </td>
                         </tr>
                         
-                        <!-- Content -->
+                        <!-- Main Content -->
                         <tr>
-                            <td style="padding: 40px;">
-                                <h2 style="margin: 0 0 20px 0; color: #333333; font-size: 24px;">
-                                    🎉 Congratulations, {customer_name}!
+                            <td style="padding: 40px 40px 20px 40px;">
+                                <h2 style="margin: 0 0 20px 0; color: #1f2937; font-size: 28px; font-weight: 700;">
+                                    Congratulations, {customer_name}!
                                 </h2>
                                 
-                                <p style="margin: 0 0 20px 0; color: #666666; font-size: 16px; line-height: 1.6;">
-                                    We're thrilled to announce that you've won the <strong>{place_str} prize</strong> in our customer appreciation draw!
+                                <p style="margin: 0 0 24px 0; color: #4b5563; font-size: 16px; line-height: 1.6;">
+                                    We are absolutely thrilled to let you know that you have been selected as our 
+                                    <span style="color: #7c3aed; font-weight: 700;">{place_str} Prize Winner</span> in our recent customer appreciation draw!
                                 </p>
 
-                                <div style="background-color: #fff4f2; border: 1px solid #ffd8d1; padding: 20px; margin: 20px 0; border-radius: 8px; text-align: center;">
-                                    <h3 style="margin: 0 0 10px 0; color: #d32f2f; font-size: 18px;">Your Prize:</h3>
-                                    <p style="margin: 0; color: #333333; font-size: 20px; font-weight: bold;">
-                                        🎁 {prize_name}
+                                <!-- Prize Box -->
+                                <div style="background: linear-gradient(to right, #fdf4ff, #fae8ff); border: 2px solid #f0abfc; padding: 30px; margin: 30px 0; border-radius: 16px; text-align: center;">
+                                    <p style="margin: 0 0 10px 0; color: #a21caf; font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px;">
+                                        Your Reward
                                     </p>
+                                    <h3 style="margin: 0; color: #1f2937; font-size: 24px; font-weight: 900;">
+                                        {prize_name}
+                                    </h3>
                                 </div>
                                 
-                                <div style="background-color: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; margin: 20px 0; border-radius: 4px;">
-                                    <p style="margin: 0; color: #333333; font-size: 16px; line-height: 1.6;">
-                                        <strong>Your Feedback:</strong><br>
+                                <!-- Feedback Quote -->
+                                <p style="margin: 30px 0 10px 0; color: #6b7280; font-size: 14px; font-weight: 600; text-transform: uppercase;">
+                                    Your Feedback
+                                </p>
+                                <div style="background-color: #f9fafb; border-left: 4px solid #7c3aed; padding: 20px; border-radius: 0 12px 12px 0; font-style: italic;">
+                                    <p style="margin: 0; color: #374151; font-size: 16px; line-height: 1.6;">
                                         "{customer_feedback}"
                                     </p>
                                 </div>
-                                
-                                <p style="margin: 0 0 20px 0; color: #666666; font-size: 16px; line-height: 1.6;">
-                                    Thank you for taking the time to share your thoughts with us. Your feedback helps us improve and serve you better!
+                            </td>
+                        </tr>
+
+                        <!-- Next Steps -->
+                        <tr>
+                            <td style="padding: 0 40px 40px 40px;">
+                                <p style="margin: 24px 0; color: #4b5563; font-size: 16px; line-height: 1.6;">
+                                    Thank you for your valuable feedback. It's customers like you who make Didi Beauty Studio what it is today!
                                 </p>
                                 
-                                <p style="margin: 0 0 20px 0; color: #666666; font-size: 16px; line-height: 1.6;">
-                                    We'll be in touch soon with details about how to receive your prize.
+                                <p style="margin: 0; color: #4b5563; font-size: 16px; line-height: 1.6;">
+                                    Show us this email next time you visit and we will hand over your prize!
                                 </p>
                                 
-                                <p style="margin: 30px 0 0 0; color: #666666; font-size: 16px; line-height: 1.6;">
-                                    Best regards,<br>
-                                    <strong>{service_provider} Team</strong>
-                                </p>
+                                <div style="margin-top: 40px; padding-top: 25px; border-top: 1px solid #e5e7eb;">
+                                    <p style="margin: 0; color: #1f2937; font-size: 16px; font-weight: 700;">
+                                        Best regards,
+                                    </p>
+                                    <p style="margin: 4px 0 0 0; color: #6b7280; font-size: 16px;">
+                                        The Didi Beauty Studio Team
+                                    </p>
+                                </div>
                             </td>
                         </tr>
                         
                         <!-- Footer -->
                         <tr>
-                            <td style="background-color: #f8f9fa; padding: 30px; text-align: center;">
-                                <p style="margin: 0; color: #999999; font-size: 14px;">
-                                    This email was sent because you participated in our customer feedback draw.
+                            <td style="background-color: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #f3f4f6;">
+                                <p style="margin: 0; color: #9ca3af; font-size: 12px; line-height: 1.5;">
+                                    This email was sent to {customer_name} as part of the Didi Beauty Studio Luck of a Draw promotion.
+                                </p>
+                                <p style="margin: 10px 0 0 0; color: #9ca3af; font-size: 12px;">
+                                    © 2025 Didi Beauty Studio. All rights reserved.
                                 </p>
                             </td>
                         </tr>

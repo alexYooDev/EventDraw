@@ -64,6 +64,21 @@ class EmailService:
         Returns:
             str: HTML email content
         """
+        # Load template from file
+        template_path = os.path.join(
+            os.path.dirname(os.path.dirname(__file__)),
+            'templates',
+            'winner_email.html'
+        )
+        
+        try:
+            with open(template_path, 'r', encoding='utf-8') as f:
+                template_content = f.read()
+        except Exception as e:
+            print(f"Error loading email template: {str(e)}")
+            # Fallback simple template if file load fails
+            template_content = "<h1>Congratulations, {customer_name}!</h1><p>You won the {place_str} prize: {prize_name}</p>"
+
         # Prize details
         prizes = {
             1: "Whipped Shampoo for Eyelash",
@@ -74,7 +89,7 @@ class EmailService:
         place_str = {1: "1st", 2: "2nd", 3: "3rd"}.get(customer.winner_place, "")
 
         # Substitute customer data
-        html_content = template.format(
+        html_content = template_content.format(
             customer_name=customer.name,
             customer_feedback=customer.feedback,
             prize_name=prize_name,
