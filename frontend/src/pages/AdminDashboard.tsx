@@ -34,8 +34,8 @@ export function AdminDashboard() {
   return (
     <div className={`min-h-screen bg-gradient-to-br ${theme.colors.background}`}>
       {/* Header */}
-      <header className="bg-white shadow-md">
-        <div className="max-w-7xl mx-auto px-4 py-4 md:py-6">
+      <header className="bg-white shadow-md w-full">
+        <div className="w-full px-4 py-4 md:py-6">
           {/* Mobile: Stacked Layout */}
           <div className="flex flex-col md:hidden space-y-3">
             <div className="flex justify-between items-center">
@@ -103,8 +103,8 @@ export function AdminDashboard() {
       </header>
 
       {/* Tab Navigation */}
-      <nav className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4">
+      <nav className="bg-white shadow-sm w-full">
+        <div className="w-full px-4">
           <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 py-4">
             <button
               onClick={() => setActiveTab('roulette')}
@@ -139,14 +139,14 @@ export function AdminDashboard() {
       </nav>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="w-full px-4 py-8">
         {activeTab === 'roulette' && <RouletteWheel onWinnerSelected={handleWinnerSelected} />}
         {activeTab === 'customers' && <CustomerList key={refreshKey} />}
       </main>
 
       {/* Footer */}
-      <footer className="bg-white mt-12 py-6 shadow-inner">
-        <div className="max-w-7xl mx-auto px-4 text-center text-gray-600">
+      <footer className="bg-white mt-12 py-6 shadow-inner w-full">
+        <div className="w-full px-4 text-center text-gray-600">
           <p className="text-xs">Built with React + TypeScript + Tailwind CSS + FastAPI</p>
         </div>
       </footer>

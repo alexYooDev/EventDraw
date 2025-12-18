@@ -68,7 +68,7 @@ class EmailService:
         prizes = {
             1: "Whipped Shampoo for Eyelash",
             2: "Eyelash Coating Gel",
-            3: "Eyelash Adhesive Remover"
+            3: "Eyelash Removal Service"
         }
         prize_name = prizes.get(customer.winner_place, "a special prize")
         place_str = {1: "1st", 2: "2nd", 3: "3rd"}.get(customer.winner_place, "")
