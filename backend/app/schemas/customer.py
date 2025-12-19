@@ -41,6 +41,8 @@ class CustomerResponse(CustomerBase):
     id: int
     winner_place: Optional[int] = None
     is_winner: bool
+    is_notified: bool
+    notified_at: Optional[datetime] = None
     created_at: datetime
     updated_at: Optional[datetime] = None
 

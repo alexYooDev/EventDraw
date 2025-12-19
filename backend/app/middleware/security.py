@@ -21,21 +21,25 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     """
     
     async def dispatch(self, request: Request, call_next):
-        response: Response = await call_next(request)
-        
-        # Prevent MIME type sniffing
-        response.headers["X-Content-Type-Options"] = "nosniff"
-        
-        # Prevent clickjacking
-        response.headers["X-Frame-Options"] = "DENY"
-        
-        # Enable XSS filter
-        response.headers["X-XSS-Protection"] = "1; mode=block"
-        
-        # Enforce HTTPS (only in production)
-        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
-        
-        # Control referrer information
-        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-        
-        return response
+        try:
+            response: Response = await call_next(request)
+            
+            # Prevent MIME type sniffing
+            response.headers["X-Content-Type-Options"] = "nosniff"
+            
+            # Prevent clickjacking
+            response.headers["X-Frame-Options"] = "DENY"
+            
+            # Enable XSS filter
+            response.headers["X-XSS-Protection"] = "1; mode=block"
+            
+            # Enforce HTTPS (only in production)
+            response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+            
+            # Control referrer information
+            response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+            
+            return response
+        except Exception as e:
+            # If an exception occurs, let it propagate but ensure we're not blocking CORS in the outer layer
+            raise e

@@ -179,6 +179,10 @@ export function RouletteWheel({ onWinnerSelected }: RouletteWheelProps) {
                   {pendingWinner.name}
                 </p>
                 <p className="text-xs sm:text-sm text-gray-600 break-all">{pendingWinner.email}</p>
+                <div className="mt-3 p-3 bg-gray-50 border border-gray-100 rounded text-left">
+                  <p className="text-xs text-gray-500 font-semibold uppercase mb-1">Feedback:</p>
+                  <p className="text-sm text-gray-700 italic">"{pendingWinner.feedback}"</p>
+                </div>
               </div>
               <p className="text-sm sm:text-base text-gray-700 mb-4 sm:mb-6">
                 Assign a prize place and send a notification:

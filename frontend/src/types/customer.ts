@@ -9,6 +9,8 @@ export interface Customer {
     email: string;
     feedback: string;
     is_winner: boolean;
+    is_notified: boolean;
+    notified_at: string | null;
     winner_place: number | null;
     created_at: string;
     updated_at: string | null;

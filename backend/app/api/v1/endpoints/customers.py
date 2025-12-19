@@ -194,51 +194,72 @@ def notify_winner(notification_data: WinnerNotification, db: Session = Depends(g
     - customer_id: ID of the winner to notify
     - send_immediately: Whether to send the notification now or queue it for later
     """
-    from app.services.email_service import EmailService
-    
-    repo = CustomerRepository(db)
-    customer = repo.get_by_id(notification_data.customer_id)
+    import traceback
+    try:
+        from app.services.email_service import EmailService
+        
+        repo = CustomerRepository(db)
+        customer = repo.get_by_id(notification_data.customer_id)
 
-    if not customer:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Customer not found"
-        )
+        if not customer:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Customer not found"
+            )
 
-    if not customer.is_winner:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Customer is not marked as a winner"
-        )
+        if not customer.is_winner:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Customer is not marked as a winner"
+            )
 
-    if notification_data.send_immediately:
-        # Send email via Resend
-        try:
-            email_service = EmailService()
-            success, message = email_service.send_winner_notification(customer)
-            
+        if notification_data.send_immediately:
+            # Send email via Resend
+            try:
+                email_service = EmailService()
+                success, message = email_service.send_winner_notification(customer)
+                
+                if success:
+                    from datetime import datetime
+                    customer.is_notified = True
+                    customer.notified_at = datetime.now()
+                    db.commit()
+                    db.refresh(customer)
+
+                return NotificationResponse(
+                    success=success,
+                    message=message,
+                    email_sent_to=customer.email if success else None
+                )
+            except ValueError as e:
+                # Handle missing API key
+                print(f"Email service configuration error: {str(e)}")
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail=f"Email service not configured: {str(e)}"
+                )
+            except Exception as e:
+                # Handle other email errors
+                print(f"Error in email service: {str(e)}")
+                traceback.print_exc()
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail=f"Failed to send email: {str(e)}"
+                )
+        else:
+            # Queue for later (not implemented yet)
+            message = f"Winner notification queued for {customer.email}"
             return NotificationResponse(
-                success=success,
+                success=True,
                 message=message,
-                email_sent_to=customer.email if success else None
+                email_sent_to=None
             )
-        except ValueError as e:
-            # Handle missing API key
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Email service not configured: {str(e)}"
-            )
-        except Exception as e:
-            # Handle other email errors
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"Failed to send email: {str(e)}"
-            )
-    else:
-        # Queue for later (not implemented yet)
-        message = f"Winner notification queued for {customer.email}"
-        return NotificationResponse(
-            success=True,
-            message=message,
-            email_sent_to=None
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Unexpected error in notify_winner: {str(e)}")
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Internal server error: {str(e)}"
         )
