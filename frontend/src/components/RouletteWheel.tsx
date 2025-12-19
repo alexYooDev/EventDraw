@@ -2,17 +2,19 @@
  * RouletteWheel Component
  * Interactive roulette wheel for selecting a random winner
  */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { customerService } from '../services/customerService';
+import { organizationService, type Prize } from '../services/organizationService';
 import type { Customer } from '../types/customer';
 import { useTheme } from '../contexts/ThemeContext';
+import { WinnerDisplay } from './WinnerDisplay';
 
 interface RouletteWheelProps {
   onWinnerSelected?: (winner: Customer) => void;
 }
 
 export function RouletteWheel({ onWinnerSelected }: RouletteWheelProps) {
-  const { theme } = useTheme();
+  const { theme, updatePrimaryColor } = useTheme();
   const [isSpinning, setIsSpinning] = useState(false);
   const [winner, setWinner] = useState<Customer | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -20,6 +22,26 @@ export function RouletteWheel({ onWinnerSelected }: RouletteWheelProps) {
   const [showNotificationDialog, setShowNotificationDialog] = useState(false);
   const [pendingWinner, setPendingWinner] = useState<Customer | null>(null);
   const [selectedPlace, setSelectedPlace] = useState<number>(1);
+  const [prizes, setPrizes] = useState<Prize[]>([]);
+  const [loadingPrizes, setLoadingPrizes] = useState(true);
+
+  useEffect(() => {
+    const fetchOrgData = async () => {
+      try {
+        const orgData = await organizationService.getMyOrg();
+        if (orgData.primary_color) {
+            updatePrimaryColor(orgData.primary_color);
+        }
+        const prizeData = await organizationService.getPublicPrizes(orgData.slug);
+        setPrizes(prizeData.sort((a, b) => a.place - b.place));
+      } catch (err) {
+        console.error('Failed to fetch org/prizes:', err);
+      } finally {
+        setLoadingPrizes(false);
+      }
+    };
+    fetchOrgData();
+  }, [updatePrimaryColor]);
 
   const spinWheel = async () => {
     if (isSpinning) return;
@@ -95,10 +117,25 @@ export function RouletteWheel({ onWinnerSelected }: RouletteWheelProps) {
           <div className="relative w-48 h-48 sm:w-64 sm:h-64">
             {/* Wheel */}
             <div
-              className={`w-full h-full rounded-full border-4 sm:border-8 border-${theme.colors.primary} bg-gradient-to-br ${theme.gradients.button} shadow-2xl flex items-center justify-center relative overflow-hidden`}
+              className={`w-full h-full rounded-full border-4 sm:border-8 border-${theme.colors.primary} shadow-2xl flex items-center justify-center relative overflow-hidden`}
               style={{
                 transform: `rotate(${rotation}deg)`,
                 transition: isSpinning ? 'transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99)' : 'none',
+                borderColor: theme.colors.primary.startsWith('#') ? theme.colors.primary : undefined,
+                background: `conic-gradient(
+                  #EF4444 0deg 30deg,
+                  #F59E0B 30deg 60deg,
+                  #10B981 60deg 90deg,
+                  #3B82F6 90deg 120deg,
+                  #6366F1 120deg 150deg,
+                  #8B5CF6 150deg 180deg,
+                  #EC4899 180deg 210deg,
+                  #F43F5E 210deg 240deg,
+                  #84CC16 240deg 270deg,
+                  #06B6D4 270deg 300deg,
+                  #F97316 300deg 330deg,
+                  #A855F7 330deg 360deg
+                )`
               }}
             >
               {/* Segment Lines */}
@@ -113,10 +150,14 @@ export function RouletteWheel({ onWinnerSelected }: RouletteWheelProps) {
                 />
               ))}
 
-              {/* Center Content */}
-              <div className="text-white text-center relative z-10">
-                <div className="text-2xl sm:text-4xl mb-1 sm:mb-2">{theme.emojis.main}</div>
-                <div className="font-bold text-xs sm:text-base">SPIN</div>
+              {/* Center Hub */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-full shadow-lg flex items-center justify-center z-10 border-4 border-gray-100">
+                  <div className="text-center">
+                    <div className="text-xl sm:text-3xl mb-0.5">{theme.emojis.main}</div>
+                    <div className="font-bold text-[10px] sm:text-xs text-gray-800 tracking-tighter">SPIN</div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -131,10 +172,10 @@ export function RouletteWheel({ onWinnerSelected }: RouletteWheelProps) {
         <div className="flex justify-center mb-4 sm:mb-6">
           <button
             onClick={spinWheel}
-            disabled={isSpinning}
-            className={`px-6 sm:px-8 py-2 sm:py-3 bg-gradient-to-r ${theme.gradients.button} text-white font-bold text-base sm:text-lg rounded-full disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed transform hover:scale-105 transition-all shadow-lg`}
+            disabled={isSpinning || loadingPrizes}
+            className={`px-6 sm:px-8 py-2 sm:py-3 text-white font-bold text-base sm:text-lg rounded-full disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed cursor-pointer transform hover:scale-105 transition-all shadow-lg bg-gradient-to-r ${theme.gradients.button}`}
           >
-            {isSpinning ? 'Spinning...' : 'Spin the Wheel!'}
+            {isSpinning ? 'Spinning...' : loadingPrizes ? 'Loading...' : 'Spin the Wheel!'}
           </button>
         </div>
 
@@ -145,57 +186,46 @@ export function RouletteWheel({ onWinnerSelected }: RouletteWheelProps) {
           </div>
         )}
 
-        {/* Winner Display */}
+        {/* Winner Display Integration */}
         {winner && !isSpinning && !showNotificationDialog && (
-          <div className="mt-4 sm:mt-6 p-4 sm:p-6 bg-gradient-to-r from-yellow-50 to-yellow-100 border-2 border-yellow-400 rounded-lg text-center animate-pulse">
-            <div className="text-3xl sm:text-4xl mb-2">{theme.emojis.celebration[0]}</div>
-            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
-              Congratulations!
-            </h3>
-            <p className="text-lg sm:text-xl text-gray-800 font-semibold mb-1">
-              {winner.name}
-            </p>
-            <p className="text-xs sm:text-sm text-gray-600">{winner.email}</p>
-            <div className="mt-3 sm:mt-4 text-xl sm:text-2xl space-x-1 sm:space-x-2">
-              {theme.emojis.decoration.slice(0, 5).map((emoji, index) => (
-                <span key={index}>{emoji}</span>
-              ))}
-            </div>
-          </div>
+          <WinnerDisplay winner={winner} />
         )}
       </div>
 
       {/* Notification Dialog Modal */}
       {showNotificationDialog && pendingWinner && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-2xl p-5 sm:p-8 max-w-md w-full animate-fadeIn">
-            <div className="text-center mb-4 sm:mb-6">
-              <div className="text-4xl sm:text-6xl mb-3 sm:mb-4">{theme.emojis.celebration[0]}</div>
-              <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
-                Winner Selected!
-              </h3>
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 sm:p-4 mb-3 sm:mb-4">
-                <p className="text-lg sm:text-xl font-semibold text-gray-900 mb-1">
-                  {pendingWinner.name}
-                </p>
-                <p className="text-xs sm:text-sm text-gray-600 break-all">{pendingWinner.email}</p>
-                <div className="mt-3 p-3 bg-gray-50 border border-gray-100 rounded text-left">
-                  <p className="text-xs text-gray-500 font-semibold uppercase mb-1">Feedback:</p>
-                  <p className="text-sm text-gray-700 italic">"{pendingWinner.feedback}"</p>
-                </div>
-              </div>
-              <p className="text-sm sm:text-base text-gray-700 mb-4 sm:mb-6">
-                Assign a prize place and send a notification:
-              </p>
+        <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-2xl p-5 sm:p-8 max-w-md w-full animate-fadeIn overflow-y-auto max-h-[90vh]">
+            <div className="mb-6">
+              <WinnerDisplay winner={pendingWinner} showCard={false} />
+            </div>
+            
+            <div className="text-center mb-6">
               
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">Select Prize</label>
-                <div className="grid grid-cols-3 gap-2">
-                  {[1, 2, 3].map((p) => (
+                <div className="flex flex-col gap-2">
+                  {prizes.length > 0 ? prizes.map((p) => (
+                    <button
+                      key={p.id}
+                      onClick={() => setSelectedPlace(p.place)}
+                      className={`py-2 px-4 rounded-lg border-2 font-bold text-sm transition-all text-left flex justify-between items-center cursor-pointer ${
+                        selectedPlace === p.place 
+                          ? 'border-blue-600 bg-blue-50 text-blue-700' 
+                          : 'border-gray-200 bg-gray-50 text-gray-500 hover:border-gray-300'
+                      }`}
+                    >
+                      <span>{p.place}{p.place === 1 ? 'st' : p.place === 2 ? 'nd' : 'rd'} Place</span>
+                      <span className="text-xs opacity-70">{p.name}</span>
+                    </button>
+                  )) : (
+                    <p className="text-xs text-gray-500">No prizes configured. Defaulting to numbers.</p>
+                  )}
+                  {prizes.length === 0 && [1, 2, 3].map((p) => (
                     <button
                       key={p}
                       onClick={() => setSelectedPlace(p)}
-                      className={`py-2 px-3 rounded-lg border-2 font-bold text-sm transition-all ${
+                      className={`py-2 px-3 rounded-lg border-2 font-bold text-sm transition-all cursor-pointer ${
                         selectedPlace === p 
                           ? 'border-blue-600 bg-blue-50 text-blue-700' 
                           : 'border-gray-200 bg-gray-50 text-gray-400 hover:border-gray-300'
@@ -211,13 +241,13 @@ export function RouletteWheel({ onWinnerSelected }: RouletteWheelProps) {
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <button
                 onClick={() => handleSendNotification(true)}
-                className="flex-1 px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-green-600 to-green-700 text-white font-semibold rounded-lg hover:from-green-700 hover:to-green-800 transition-all shadow-md text-sm sm:text-base"
+                className="flex-1 px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-green-600 to-green-700 text-white font-semibold rounded-lg hover:from-green-700 hover:to-green-800 transition-all shadow-md text-sm sm:text-base cursor-pointer"
               >
                 Send Now
               </button>
               <button
                 onClick={() => handleSendNotification(false)}
-                className="flex-1 px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white font-semibold rounded-lg hover:from-gray-600 hover:to-gray-700 transition-all shadow-md text-sm sm:text-base"
+                className="flex-1 px-4 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-gray-500 to-gray-600 text-white font-semibold rounded-lg hover:from-gray-600 hover:to-gray-700 transition-all shadow-md text-sm sm:text-base cursor-pointer"
               >
                 Send Later
               </button>

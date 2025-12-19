@@ -1,13 +1,40 @@
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { organizationService, type Organization } from '../services/organizationService';
 
 export default function PrivacyPolicy() {
+  const { slug } = useParams<{ slug?: string }>();
+  const activeSlug = slug || 'didi-beauty';
+  const [org, setOrg] = useState<Organization | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchOrg = async () => {
+      try {
+        const orgData = await organizationService.getPublicOrg(activeSlug);
+        setOrg(orgData);
+      } catch (err) {
+        console.error('Failed to fetch org for privacy policy:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchOrg();
+  }, [activeSlug]);
+
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center bg-gray-50">Loading privacy policy...</div>;
+  }
+
+  const businessName = org?.name || 'Luck of a Draw';
+
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 py-12">
       <div className="w-full px-4 sm:px-8 lg:px-16 bg-white shadow-lg p-8">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Privacy Policy</h1>
-          <p className="text-gray-600">Didi Beauty Studio - Luck of a Draw</p>
+          <p className="text-gray-600">{businessName} - Luck of a Draw</p>
           <p className="text-sm text-gray-500 mt-2">Last Updated: December 17, 2025</p>
         </div>
 
@@ -28,9 +55,9 @@ export default function PrivacyPolicy() {
             <h2 className="text-2xl font-semibold text-gray-900 mb-3">2. How We Use Your Information</h2>
             <p className="text-gray-700 mb-2">We use your information for:</p>
             <ul className="list-disc pl-6 text-gray-700 space-y-1">
-              <li>Entering you into our prize draw</li>
+              <li>Entering you into the {businessName} prize draw</li>
               <li>Contacting you if you win</li>
-              <li>Improving our services based on your feedback</li>
+              <li>Improving {businessName}'s services based on your feedback</li>
               <li>Analyzing customer satisfaction trends</li>
             </ul>
           </section>
@@ -46,8 +73,8 @@ export default function PrivacyPolicy() {
           <section className="mb-6">
             <h2 className="text-2xl font-semibold text-gray-900 mb-3">4. Data Retention</h2>
             <p className="text-gray-700">
-              We retain your information for 12 months from the date of submission. After this period, 
-              your data will be automatically deleted from our systems.
+              We retain your information for the duration of the promotion. After the campaign ends, 
+              your data will be handled in accordance with local regulations.
             </p>
           </section>
 
@@ -84,11 +111,10 @@ export default function PrivacyPolicy() {
           <section className="mb-6">
             <h2 className="text-2xl font-semibold text-gray-900 mb-3">8. Contact Us</h2>
             <p className="text-gray-700">
-              For privacy-related questions or to exercise your rights, contact us at:
+              For privacy-related questions or to exercise your rights, please contact the business directly or through our platform.
             </p>
             <p className="text-gray-700 mt-2">
-              <strong>Email:</strong> didibeautystudiobne@gmail.com<br />
-              <strong>Business:</strong> Didi Beauty Studio
+              <strong>Business:</strong> {businessName}
             </p>
           </section>
 
@@ -104,7 +130,7 @@ export default function PrivacyPolicy() {
         {/* Footer */}
         <div className="mt-8 pt-6 border-t border-gray-200">
           <Link 
-            to="/"
+            to={`/feedback/${activeSlug}`}
             className="inline-flex items-center text-purple-600 hover:text-purple-700 font-medium"
           >
             ← Back to Feedback Form

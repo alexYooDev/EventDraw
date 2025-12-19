@@ -9,6 +9,9 @@ from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.api.deps import get_current_user
+from app.models.user import User
+from app.models.organization import Organization
 from app.core.rate_limit import limiter
 from app.repositories.customer_repository import CustomerRepository
 from app.schemas.customer import (
@@ -41,32 +44,39 @@ def create_customer(
     - name: customer's full name
     - email: customer's email address (must be unique)
     - feedback: customer's feedback
+    - organization_slug: The slug of the business
     """
-    repo = CustomerRepository(db)
+    # Find organization by slug
+    org = db.query(Organization).filter(Organization.slug == customer_data.organization_slug).first()
+    if not org:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Organization not found"
+        )
 
-    # Check if email already exists
+    repo = CustomerRepository(db, organization_id=org.id)
+
+    # Check if email already exists for this organization
     existing_customer = repo.get_by_email(customer_data.email)
     if existing_customer:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email already registered"
+            detail="Email already registered for this draw"
         )
 
-    return repo.create(customer_data)
+    return repo.create(customer_data, org_id=org.id)
 
 @router.get('/', response_model=CustomerListResponse)
 def get_customers(
     skip: int = 0,
     limit: int = 100,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     """
-    Get a list of customers.
-    
-    - skip: Number of customers to skip
-    - limit: Maximum number of customers to return
+    Get a list of customers for the current organization.
     """
-    repo = CustomerRepository(db)
+    repo = CustomerRepository(db, organization_id=current_user.organization_id)
     customers = repo.get_all(skip=skip, limit=limit)
     total = repo.get_count()
 
@@ -75,15 +85,13 @@ def get_customers(
 @router.get('/{customer_id}', response_model=CustomerResponse)
 def get_customer_by_id(
     customer_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     """
     Get a customer by ID.
-    
-    - customer_id: ID of the customer to retrieve
     """
-    repo = CustomerRepository(db)
-
+    repo = CustomerRepository(db, organization_id=current_user.organization_id)
     customer = repo.get_by_id(customer_id)
     
     if not customer:
@@ -98,18 +106,15 @@ def get_customer_by_id(
 def update_customer(
     customer_id: int,
     customer_data: CustomerUpdate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     """
     Update an existing customer entry.
-    
-    - customer_id: ID of the customer to update
-    - customer_data: Updated customer data
     """
-    
-    repo = CustomerRepository(db)
+    repo = CustomerRepository(db, organization_id=current_user.organization_id)
 
-    # If email is being updated, check if it's already taken
+    # If email is being updated, check if it's already taken in this org
     if customer_data.email:
         existing = repo.get_by_email(customer_data.email)
         if existing and existing.id != customer_id:
@@ -129,11 +134,15 @@ def update_customer(
     return customer
 
 @router.delete('/{customer_id}', status_code=status.HTTP_204_NO_CONTENT)
-def delete_customer(customer_id: int, db: Session = Depends(get_db)):
+def delete_customer(
+    customer_id: int, 
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     """
     Delete a customer.
     """
-    repo = CustomerRepository(db)
+    repo = CustomerRepository(db, organization_id=current_user.organization_id)
     success = repo.delete(customer_id)
 
     if not success:
@@ -144,13 +153,14 @@ def delete_customer(customer_id: int, db: Session = Depends(get_db)):
 
 
 @router.get('/winner/random', response_model=CustomerResponse)
-def get_random_winner(db: Session = Depends(get_db)):
+def get_random_winner(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     """
-    Get a random customer who hasn't won yet
-    
-    This is used for the roulette winner selection
+    Get a random customer who hasn't won yet from the current organization.
     """
-    repo = CustomerRepository(db)
+    repo = CustomerRepository(db, organization_id=current_user.organization_id)
     winner = repo.get_random_non_winner()
 
     if not winner:
@@ -165,14 +175,13 @@ def get_random_winner(db: Session = Depends(get_db)):
 def mark_customer_as_winner(
     customer_id: int, 
     winner_place: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     """
-    Mark a customer as a winner
-
-    This updates the is_winner flag to True and sets the winner_place
+    Mark a customer as a winner.
     """
-    repo = CustomerRepository(db)
+    repo = CustomerRepository(db, organization_id=current_user.organization_id)
     customer = repo.mark_as_winner(customer_id, winner_place)
 
     if not customer:
@@ -185,7 +194,11 @@ def mark_customer_as_winner(
 
 
 @router.post('/notify-winner', response_model=NotificationResponse)
-def notify_winner(notification_data: WinnerNotification, db: Session = Depends(get_db)):
+def notify_winner(
+    notification_data: WinnerNotification, 
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     """
     Send notification to winner via email.
 
@@ -196,9 +209,7 @@ def notify_winner(notification_data: WinnerNotification, db: Session = Depends(g
     """
     import traceback
     try:
-        from app.services.email_service import EmailService
-        
-        repo = CustomerRepository(db)
+        repo = CustomerRepository(db, organization_id=current_user.organization_id)
         customer = repo.get_by_id(notification_data.customer_id)
 
         if not customer:
@@ -216,6 +227,7 @@ def notify_winner(notification_data: WinnerNotification, db: Session = Depends(g
         if notification_data.send_immediately:
             # Send email via Resend
             try:
+                from app.services.email_service import EmailService
                 email_service = EmailService()
                 success, message = email_service.send_winner_notification(customer)
                 

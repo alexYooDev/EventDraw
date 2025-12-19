@@ -21,7 +21,7 @@ class CustomerCreate(CustomerBase):
     Schema for creating a new customer.
     Used for POST requests.
     """
-    pass
+    organization_slug: str = Field(..., description="The unique slug of the organization")
 
 class CustomerUpdate(CustomerBase):
     """ 

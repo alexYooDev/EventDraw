@@ -34,15 +34,15 @@ export const themes: Record<ThemeType, Theme> = {
         name: 'default',
         displayName: 'Default',
         colors: {
-            primary: 'blue-600',
-            secondary: 'purple-600',
-            accent: 'pink-600',
+            primary: 'slate-900',
+            secondary: 'indigo-800',
+            accent: 'cyan-600',
             background: 'from-blue-50 via-purple-50 to-pink-50',
         },
         gradients: {
-            header: 'from-blue-600 to-purple-600',
+            header: 'from-slate-900 to-indigo-900',
             background: 'from-blue-50 via-purple-50 to-pink-50',
-            button: 'from-blue-600 to-purple-600',
+            button: 'from-slate-800 to-indigo-900',
         },
         emojis: {
             main: '🎰',
@@ -58,15 +58,15 @@ export const themes: Record<ThemeType, Theme> = {
         name: 'christmas',
         displayName: '🎄 Christmas',
         colors: {
-            primary: 'red-600',
-            secondary: 'green-700',
-            accent: 'yellow-500',
+            primary: 'red-900',
+            secondary: 'emerald-900',
+            accent: 'amber-600',
             background: 'from-red-50 via-green-50 to-red-50',
         },
         gradients: {
-            header: 'from-red-600 to-green-700',
+            header: 'from-red-900 to-emerald-900',
             background: 'from-red-50 via-green-50 to-red-50',
-            button: 'from-red-600 to-green-700',
+            button: 'from-red-800 to-emerald-900',
         },
         emojis: {
             main: '🎄',
@@ -82,15 +82,15 @@ export const themes: Record<ThemeType, Theme> = {
         name: 'new-year',
         displayName: '🎆 New Year',
         colors: {
-            primary: 'purple-600',
-            secondary: 'yellow-500',
-            accent: 'pink-500',
+            primary: 'indigo-950',
+            secondary: 'amber-500',
+            accent: 'rose-500',
             background: 'from-purple-50 via-yellow-50 to-pink-50',
         },
         gradients: {
-            header: 'from-purple-600 via-pink-500 to-yellow-500',
+            header: 'from-indigo-950 via-slate-900 to-amber-600',
             background: 'from-purple-50 via-yellow-50 to-pink-50',
-            button: 'from-purple-600 via-pink-500 to-yellow-500',
+            button: 'from-indigo-900 to-amber-700',
         },
         emojis: {
             main: '🍾',

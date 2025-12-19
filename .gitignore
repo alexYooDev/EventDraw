@@ -1,5 +1,6 @@
 # ignore docs
 /docs
+/backend/utils
 
 # database migration script
 /alembic/versions

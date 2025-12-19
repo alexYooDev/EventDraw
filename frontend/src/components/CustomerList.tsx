@@ -113,7 +113,7 @@ export function CustomerList() {
                                             <button
                                                 onClick={() => handleNotify(customer.id)}
                                                 disabled={notifyingIds[customer.id]}
-                                                className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors ${
+                                                className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
                                                     notifyingIds[customer.id] 
                                                         ? 'bg-gray-200 text-gray-500' 
                                                         : 'bg-blue-600 text-white hover:bg-blue-700'

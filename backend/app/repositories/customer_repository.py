@@ -13,19 +13,31 @@ from app.schemas.customer import CustomerCreate, CustomerUpdate
 class CustomerRepository:
     """ Customer repository for database operations. """
     
-    def __init__(self, db: Session):
+    def __init__(self, db: Session, organization_id: Optional[int] = None):
         """  Initialize repository with database session 
-            Args: db: SQLAlchemy database session
+            Args: 
+                db: SQLAlchemy database session
+                organization_id: ID of the organization to filter by
         """
         self.db = db
+        self.organization_id = organization_id
 
-    def create(self, customer_data: CustomerCreate) -> Customer:
+    def create(self, customer_data: CustomerCreate, org_id: Optional[int] = None) -> Customer:
         """ Create a new customer in the database. 
-            Args: customer_data: Customer data from request
+            Args: 
+                customer_data: Customer data from request
+                org_id: Organization ID (override)
             Returns: Created Customer model instance
         """
+        data = customer_data.model_dump()
+        # Remove organization_slug as it's not a field in the Customer model
+        data.pop("organization_slug", None)
         
-        db_customer = Customer(**customer_data.model_dump())
+        target_org_id = org_id or self.organization_id
+        if target_org_id:
+            data["organization_id"] = target_org_id
+            
+        db_customer = Customer(**data)
         self.db.add(db_customer)
         self.db.commit()
         self.db.refresh(db_customer)
@@ -37,31 +49,38 @@ class CustomerRepository:
         Args: customer_id: ID of the customer to retrieve
         Returns: Customer model instance if found, None otherwise
         """
-        return self.db.query(Customer).filter(Customer.id == customer_id).first()
+        query = self.db.query(Customer).filter(Customer.id == customer_id)
+        if self.organization_id:
+            query = query.filter(Customer.organization_id == self.organization_id)
+        return query.first()
 
-    def get_by_email(self, email: str) -> Optional[Customer]:
+    def get_by_email(self, email: str, org_id: Optional[int] = None) -> Optional[Customer]:
         """
-        Get a customer by email address.
-        Args: email: Customer's email address
-        Returns: Customer model instance if found, None otherwise
+        Get a customer by email address within an organization.
         """
-        return self.db.query(Customer).filter(Customer.email == email).first()
+        target_org_id = org_id or self.organization_id
+        query = self.db.query(Customer).filter(Customer.email == email)
+        if target_org_id:
+            query = query.filter(Customer.organization_id == target_org_id)
+        return query.first()
 
     def get_all(self, skip: int = 0, limit: int = 100) -> List[Customer]:
         """ 
         Get all customers from the database.
-        Args: skip: Number of customers to skip
-        limit: Maximum number of customers to return
-        Returns: List of Customer model instances
         """
-        return self.db.query(Customer).offset(skip).limit(limit).all()
+        query = self.db.query(Customer)
+        if self.organization_id:
+            query = query.filter(Customer.organization_id == self.organization_id)
+        return query.offset(skip).limit(limit).all()
 
     def get_count(self) -> int:
         """ 
         Get the total count of customers in the database. 
-        Returns: Total number of customers in database
         """
-        return self.db.query(Customer).count()
+        query = self.db.query(Customer)
+        if self.organization_id:
+            query = query.filter(Customer.organization_id == self.organization_id)
+        return query.count()
 
     def update(self, customer_id: int, customer_data: CustomerUpdate) -> Optional[Customer]:
         """
@@ -90,12 +109,6 @@ class CustomerRepository:
     def delete(self, customer_id: int) -> bool:
         """
         Delete a customer
-
-        Args:
-            customer_id: Customer's ID
-        
-        Returns:
-            True if deleted, False if not found
         """
 
         db_customer = self.get_by_id(customer_id)
@@ -115,12 +128,11 @@ class CustomerRepository:
 
         from sqlalchemy.sql.expression import func
 
-        return (
-            self.db.query(Customer)
-            .filter(Customer.is_winner == False)
-            .order_by(func.random())
-            .first()
-        )
+        query = self.db.query(Customer).filter(Customer.is_winner == False)
+        if self.organization_id:
+            query = query.filter(Customer.organization_id == self.organization_id)
+            
+        return query.order_by(func.random()).first()
 
     def mark_as_winner(self, customer_id: int, winner_place: int) -> Optional[Customer]:
         """

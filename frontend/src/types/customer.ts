@@ -20,6 +20,7 @@ export interface CustomerCreate {
     name: string;
     email: string;
     feedback: string;
+    organization_slug: string;
 }
 
 export interface CustomerUpdate {

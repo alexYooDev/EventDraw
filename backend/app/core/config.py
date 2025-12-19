@@ -30,9 +30,11 @@ class Settings(BaseSettings):
     # For production, you can pass comma-separated URLs as env var
     # Example: CORS_ORIGINS="https://your-app.vercel.app,https://custom-domain.com"
     CORS_ORIGINS: list[str] = [
-        "https://event-draw-seven.vercel.app", # custom-domain.com
-        "http://localhost:5173",  # Default Vite port
-        "http://localhost:3000"   # Alternative port for Vite
+        "https://event-draw-seven.vercel.app", 
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000"
     ]
     
     model_config = SettingsConfigDict(

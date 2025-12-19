@@ -5,12 +5,13 @@
 import { useState } from 'react';
 import { CustomerList } from '../components/CustomerList';
 import { RouletteWheel } from '../components/RouletteWheel';
+import { OrganizationSettings } from '../components/OrganizationSettings';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { themes } from '../types/theme';
 import type { ThemeType } from '../types/theme';
 
-type Tab = 'roulette' | 'customers';
+type Tab = 'roulette' | 'customers' | 'settings';
 
 export function AdminDashboard() {
   const { theme, setTheme } = useTheme();
@@ -52,7 +53,7 @@ export function AdminDashboard() {
               </select>
               <button
                 onClick={handleLogout}
-                className="px-3 py-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-xs"
+                className="px-3 py-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-xs cursor-pointer"
               >
                 Logout
               </button>
@@ -94,7 +95,7 @@ export function AdminDashboard() {
             {/* Logout Button */}
             <button
               onClick={handleLogout}
-              className="absolute right-0 top-1/2 transform -translate-y-1/2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm"
+              className="absolute right-0 top-1/2 transform -translate-y-1/2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm cursor-pointer"
             >
               Logout
             </button>
@@ -111,11 +112,11 @@ export function AdminDashboard() {
               className={
                 activeTab === 'roulette'
                   ? theme.name === 'christmas'
-                    ? 'px-4 sm:px-6 py-2 rounded-lg font-medium transition-all shadow-md text-white bg-gradient-to-r from-red-600 to-green-700 text-sm sm:text-base'
+                    ? 'px-4 sm:px-6 py-2 rounded-lg font-medium transition-all shadow-md text-white bg-gradient-to-r from-red-600 to-green-700 text-sm sm:text-base cursor-pointer'
                     : theme.name === 'new-year'
-                    ? 'px-4 sm:px-6 py-2 rounded-lg font-medium transition-all shadow-md text-white bg-gradient-to-r from-purple-600 to-yellow-500 text-sm sm:text-base'
-                    : 'px-4 sm:px-6 py-2 rounded-lg font-medium transition-all shadow-md text-white bg-gradient-to-r from-purple-600 to-purple-600 text-sm sm:text-base'
-                  : 'px-4 sm:px-6 py-2 rounded-lg font-medium transition-all shadow-md bg-gray-100 text-gray-700 hover:bg-gray-200 text-sm sm:text-base'
+                    ? 'px-4 sm:px-6 py-2 rounded-lg font-medium transition-all shadow-md text-white bg-gradient-to-r from-purple-600 to-yellow-500 text-sm sm:text-base cursor-pointer'
+                    : 'px-4 sm:px-6 py-2 rounded-lg font-medium transition-all shadow-md text-white bg-gradient-to-r from-purple-600 to-purple-600 text-sm sm:text-base cursor-pointer'
+                  : 'px-4 sm:px-6 py-2 rounded-lg font-medium transition-all shadow-md bg-gray-100 text-gray-700 hover:bg-gray-200 text-sm sm:text-base cursor-pointer'
               }
             >
               Draw Winner
@@ -125,14 +126,28 @@ export function AdminDashboard() {
               className={
                 activeTab === 'customers'
                   ? theme.name === 'christmas'
-                    ? 'px-4 sm:px-6 py-2 rounded-lg font-medium transition-all shadow-md text-white bg-yellow-500 text-sm sm:text-base'
+                    ? 'px-4 sm:px-6 py-2 rounded-lg font-medium transition-all shadow-md text-white bg-yellow-500 text-sm sm:text-base cursor-pointer'
                     : theme.name === 'new-year'
-                    ? 'px-4 sm:px-6 py-2 rounded-lg font-medium transition-all shadow-md text-white bg-pink-500 text-sm sm:text-base'
-                    : 'px-4 sm:px-6 py-2 rounded-lg font-medium transition-all shadow-md text-white bg-pink-700 text-sm sm:text-base'
-                  : 'px-4 sm:px-6 py-2 rounded-lg font-medium transition-all shadow-md bg-gray-100 text-gray-700 hover:bg-gray-200 text-sm sm:text-base'
+                    ? 'px-4 sm:px-6 py-2 rounded-lg font-medium transition-all shadow-md text-white bg-pink-500 text-sm sm:text-base cursor-pointer'
+                    : 'px-4 sm:px-6 py-2 rounded-lg font-medium transition-all shadow-md text-white bg-pink-700 text-sm sm:text-base cursor-pointer'
+                  : 'px-4 sm:px-6 py-2 rounded-lg font-medium transition-all shadow-md bg-gray-100 text-gray-700 hover:bg-gray-200 text-sm sm:text-base cursor-pointer'
               }
             >
               View Customers
+            </button>
+            <button
+              onClick={() => setActiveTab('settings')}
+              className={
+                activeTab === 'settings'
+                  ? theme.name === 'christmas'
+                    ? 'px-4 sm:px-6 py-2 rounded-lg font-medium transition-all shadow-md text-white bg-blue-600 text-sm sm:text-base cursor-pointer'
+                    : theme.name === 'new-year'
+                    ? 'px-4 sm:px-6 py-2 rounded-lg font-medium transition-all shadow-md text-white bg-indigo-600 text-sm sm:text-base cursor-pointer'
+                    : 'px-4 sm:px-6 py-2 rounded-lg font-medium transition-all shadow-md text-white bg-indigo-700 text-sm sm:text-base cursor-pointer'
+                  : 'px-4 sm:px-6 py-2 rounded-lg font-medium transition-all shadow-md bg-gray-100 text-gray-700 hover:bg-gray-200 text-sm sm:text-base cursor-pointer'
+              }
+            >
+              Settings
             </button>
           </div>
         </div>
@@ -142,6 +157,7 @@ export function AdminDashboard() {
       <main className="w-full px-4 py-8">
         {activeTab === 'roulette' && <RouletteWheel onWinnerSelected={handleWinnerSelected} />}
         {activeTab === 'customers' && <CustomerList key={refreshKey} />}
+        {activeTab === 'settings' && <OrganizationSettings />}
       </main>
 
       {/* Footer */}
