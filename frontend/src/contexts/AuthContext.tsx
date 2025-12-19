@@ -3,7 +3,8 @@ import { apiClient } from '../services/api';
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  login: (password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<boolean>;
+  register: (businessName: string, email: string, password: string) => Promise<boolean>;
   logout: () => void;
   token: string | null;
 }
@@ -25,9 +26,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const login = async (password: string): Promise<boolean> => {
+  const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      const response = await apiClient.post('/auth/login', { password });
+      const response = await apiClient.post('/auth/login', { email, password });
       const { access_token } = response.data;
       
       // Save token
@@ -45,6 +46,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const register = async (businessName: string, email: string, password: string): Promise<boolean> => {
+    try {
+      const response = await apiClient.post('/auth/register', { 
+        business_name: businessName, 
+        email, 
+        password 
+      });
+      const { access_token } = response.data;
+      
+      // Save token
+      setToken(access_token);
+      setIsAuthenticated(true);
+      localStorage.setItem('admin_token', access_token);
+      
+      // Set token in axios headers
+      apiClient.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+      
+      return true;
+    } catch (error) {
+      console.error('Registration failed:', error);
+      return false;
+    }
+  };
+
   const logout = () => {
     setToken(null);
     setIsAuthenticated(false);
@@ -53,7 +78,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout, token }}>
+    <AuthContext.Provider value={{ isAuthenticated, login, register, logout, token }}>
       {children}
     </AuthContext.Provider>
   );

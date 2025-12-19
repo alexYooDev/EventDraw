@@ -28,16 +28,27 @@ class EmailService:
             tuple: (success: bool, message: str)
         """
         try:
-            # Create HTML email content
-            html_content = self._create_winner_email_html(customer)
-            
-            # Determine subject based on place
+            # Determine prize name and place string
             place_str = {1: "1st", 2: "2nd", 3: "3rd"}.get(customer.winner_place, "")
+            
+            # Find the prize in the database
+            prize_name = "a special prize"
+            if customer.organization and customer.organization.prizes:
+                for prize in customer.organization.prizes:
+                    if prize.place == customer.winner_place:
+                        prize_name = prize.name
+                        break
+            
+            # Create HTML email content
+            html_content = self._create_winner_email_html(customer, prize_name, place_str)
+            
             subject = f"🎉 Congratulations! You won the {place_str} Prize!" if place_str else "🎉 Congratulations! You're a Winner!"
 
             # Send email via Resend
+            # Use organization name in from field if available
+            from_name = customer.organization.name if customer.organization else settings.FROM_NAME
             params = {
-                "from": f"{settings.FROM_NAME} <{settings.FROM_EMAIL}>",
+                "from": f"{from_name} <{settings.FROM_EMAIL}>",
                 "to": [customer.email],
                 "subject": subject,
                 "html": html_content,
@@ -52,7 +63,7 @@ class EmailService:
             print(f"Email error: {error_message}")
             return False, error_message
     
-    def _create_winner_email_html(self, customer: Customer) -> str:
+    def _create_winner_email_html(self, customer: Customer, prize_name: str, place_str: str) -> str:
         """
         Create HTML email template for winner notification.
         
@@ -60,6 +71,8 @@ class EmailService:
         
         Args:
             customer: Customer object
+            prize_name: Name of the prize
+            place_str: String representation of the place (e.g., "1st")
             
         Returns:
             str: HTML email content
@@ -79,22 +92,15 @@ class EmailService:
             # Fallback simple template if file load fails
             template_content = "<h1>Congratulations, {customer_name}!</h1><p>You won the {place_str} prize: {prize_name}</p>"
 
-        # Prize details
-        prizes = {
-            1: "Whipped Shampoo for Eyelash",
-            2: "Eyelash Coating Gel",
-            3: "Eyelash Removal Service"
-        }
-        prize_name = prizes.get(customer.winner_place, "a special prize")
-        place_str = {1: "1st", 2: "2nd", 3: "3rd"}.get(customer.winner_place, "")
-
         # Substitute customer data
+        service_provider = customer.organization.name if customer.organization else 'Our Team'
+        
         html_content = template_content.format(
             customer_name=customer.name,
-            customer_feedback=customer.feedback,
+            customer_feedback=customer.feedback if customer.feedback else 'Your kind feedback',
             prize_name=prize_name,
             place_str=place_str,
-            service_provider='Didi Beauty Studio'
+            service_provider=service_provider
         )
         
         return html_content

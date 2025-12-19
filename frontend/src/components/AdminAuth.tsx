@@ -66,7 +66,7 @@ export function AdminAuth({ onAuthenticated }: AdminAuthProps) {
 
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors text-sm sm:text-base"
+              className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors text-sm sm:text-base cursor-pointer"
             >
               Access Dashboard
             </button>

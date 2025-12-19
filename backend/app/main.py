@@ -23,14 +23,13 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(SecurityHeadersMiddleware)
 
 # Configure CORS middleware
-# This allows your frontend to make requests to the backend
-
+# This should be added LAST to be the outermost middleware for handling preflights
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
+    allow_origins=settings.CORS_ORIGINS if isinstance(settings.CORS_ORIGINS, list) else ["*"],
     allow_credentials=True,
-    allow_methods=["*"], # Allows all HTTP methods (GET, POST, etc.)
-    allow_headers=["*"], # Allows all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Include API v1 router

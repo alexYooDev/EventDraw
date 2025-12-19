@@ -15,6 +15,7 @@ import { LandingPage } from './pages/LandingPage';
 import { PublicFeedbackPage } from './pages/PublicFeedbackPage';
 import { AdminDashboard } from './pages/AdminDashboard';
 import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import ProtectedRoute from './components/ProtectedRoute';
 import './App.css';
@@ -26,9 +27,12 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<LandingPage />} />
-            <Route path="/feedback" element={<PublicFeedbackPage />} />
+            <Route path="/draw/:slug" element={<LandingPage />} />
+            <Route path="/feedback/:slug" element={<PublicFeedbackPage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/privacy/:slug" element={<PrivacyPolicy />} />
             <Route 
               path="/admin" 
               element={
